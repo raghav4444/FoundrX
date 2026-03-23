@@ -1,4 +1,4 @@
-export const getInitialGameState = (startupIdea, initialMoney, moneySource) => {
+export const getInitialGameState = (startupIdea, startupType, initialMoney, moneySource) => {
   let stress = 0;
   let growth = 0;
 
@@ -26,6 +26,7 @@ export const getInitialGameState = (startupIdea, initialMoney, moneySource) => {
 
   return {
     startupIdea,
+    startupType,
     initialMoney,
     currentMoney: initialMoney,
     moneySource,

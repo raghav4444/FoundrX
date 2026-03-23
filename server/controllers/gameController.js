@@ -4,9 +4,9 @@ import { generateScenario, generateCustomScenario, generateGameSummary } from '.
 
 export const startGame = async (req, res) => {
   try {
-    const { name, startupIdea, initialMoney, moneySource } = req.body;
+    const { name, startupIdea, startupType, initialMoney, moneySource } = req.body;
     
-    const initialState = getInitialGameState(startupIdea, Number(initialMoney), moneySource);
+    const initialState = getInitialGameState(startupIdea, startupType, Number(initialMoney), moneySource);
     
     // Generate the first scenario immediately
     const firstScenario = await generateScenario(initialState);

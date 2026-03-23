@@ -30,6 +30,7 @@ export interface GameState {
   _id: string;
   userId: string;
   startupIdea: string;
+  startupType: string;
   initialMoney: number;
   currentMoney: number;
   moneySource: string;

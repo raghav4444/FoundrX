@@ -23,6 +23,7 @@ function App() {
   const handleSetupSubmit = async (data: {
     name: string;
     startupIdea: string;
+    startupType: string;
     initialMoney: number;
     moneySource: string;
   }) => {

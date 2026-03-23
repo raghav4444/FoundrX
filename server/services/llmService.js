@@ -18,8 +18,7 @@ Stage: Month ${gameState.stage}
 Past Decisions:
 ${gameState.history.map(h => `- Month ${h.stage}: Chose "${h.decision}"`).join('\n')}
 
-Context & Goal:
-Carefully analyze the specific "Idea" provided above. You must generate a scenario and choices that are HIGHLY TAILORED and UNIQUE to this exact product, industry, or service. Do NOT just give generic business problems (like "hire a freelancer" or "launch ads"). Give specific problems related to ${gameState.startupIdea} (e.g. if it is a food app, talk about delivery logistics; if it is AI tech, talk about GPU costs or hallucination bugs).
+Context & Goal22: Carefully analyze the specific "Idea" and "Industry/Type" provided above. You must generate a scenario and choices that are HIGHLY TAILORED and UNIQUE to this exact product, industry, or service (${gameState.startupType}). Do NOT just give generic business problems (like "hire a freelancer" or "launch ads"). Give specific problems related to ${gameState.startupIdea} and its niche in ${gameState.startupType}.
 
 CRITICAL RULE: If an option's "money" impact is negative (costs money), its "growth" impact MUST ALSO be negative or zero. Growth cannot increase if money decreases.
 

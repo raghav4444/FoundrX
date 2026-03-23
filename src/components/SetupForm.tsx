@@ -5,6 +5,7 @@ interface SetupFormProps {
   onSubmit: (data: {
     name: string;
     startupIdea: string;
+    startupType: string;
     initialMoney: number;
     moneySource: string;
   }) => void;
@@ -20,10 +21,22 @@ const MONEY_SOURCES = [
   { value: 'hackathon', label: 'Hackathon Prize', desc: 'Recognition boost', bonus: '+Rep' },
 ];
 
+const STARTUP_TYPES = [
+  'AI & SaaS',
+  'E-commerce',
+  'Fintech',
+  'EdTech',
+  'HealthTech',
+  'Sustainability',
+  'Gaming & Entertainment',
+  'Hardware',
+];
+
 export default function SetupForm({ onSubmit, loading }: SetupFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     startupIdea: '',
+    startupType: STARTUP_TYPES[0],
     initialMoney: 10000,
     moneySource: 'savings',
   });
@@ -99,6 +112,29 @@ export default function SetupForm({ onSubmit, loading }: SetupFormProps) {
             {errors.startupIdea && (
               <p className="text-liquid-accent1 text-sm mt-1">{errors.startupIdea}</p>
             )}
+          </div>
+
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+              <Rocket className="w-4 h-4" />
+              <span>Industry / Type</span>
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {STARTUP_TYPES.map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setFormData({ ...formData, startupType: type })}
+                  className={`px-3 py-2 rounded-lg border text-xs font-medium transition-all ${
+                    formData.startupType === type
+                      ? 'border-liquid-accent2 bg-liquid-accent2/20 text-white'
+                      : 'border-liquid-glassBorder bg-black/30 text-gray-400 hover:border-gray-500'
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>

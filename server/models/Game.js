@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const gameSchema = new mongoose.Schema({
   userId: { type: String, default: 'anonymous' },
   startupIdea: { type: String, required: true },
+  startupType: { type: String, default: 'General' },
   initialMoney: { type: Number, required: true },
   currentMoney: { type: Number, required: true },
   moneySource: { type: String, required: true },
