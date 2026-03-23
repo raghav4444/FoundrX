@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { startGame, getGameDashboard, processDecision, processCustomDecision } from '../controllers/gameController.js';
 
 const router = express.Router();
