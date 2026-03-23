@@ -7,7 +7,7 @@ import { GameState } from './types/game';
 
 type Screen = 'landing' | 'setup' | 'game' | 'result';
 
-const VITE_API_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/+$/, '');
+const VITE_API_URL = (import.meta.env.VITE_API_BASE_URL || 'https://foundrx.onrender.com').replace(/\/+$/, '');
 const API_BASE = `${VITE_API_URL}/api`;
 
 function App() {
