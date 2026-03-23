@@ -14,6 +14,16 @@ app.use(express.json());
 // Routes
 app.use('/api', gameRoutes);
 
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error('SERVER ERROR:', err.stack);
+  res.status(500).json({ 
+    success: false, 
+    error: err.message,
+    details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
+});
+
 app.get('/', (req, res) => {
   res.json({ message: 'Build or Burn API is running' });
 });
