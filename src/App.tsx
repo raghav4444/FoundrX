@@ -41,6 +41,8 @@ function App() {
       if (result.success) {
         setGameId(result.gameId);
         setScreen('game');
+      } else {
+        alert(`Server Error: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to create game:', error);
