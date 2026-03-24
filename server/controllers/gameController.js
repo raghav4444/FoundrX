@@ -61,7 +61,7 @@ export const processDecision = async (req, res) => {
     }
 
     if (!game) return res.status(404).json({ success: false, message: 'Game not found' });
-    if (game.gameStatus !== 'active') return res.status(400).json({ success: false, message: 'Game already ended' });
+    if (!['running', 'struggling', 'active'].includes(game.gameStatus)) return res.status(400).json({ success: false, message: 'Game already ended' });
 
     // Find the option user selected
     const selectedOption = game.lastScenario?.options.find(opt => opt.id === optionId);
@@ -78,20 +78,21 @@ export const processDecision = async (req, res) => {
     // Apply deterministic state changes
     game = applyDecision(game, selectedOption);
 
-    // After applying, if still active, trigger random event and next AI scenario
+    // Trigger next steps if game is still going
     let randomEvent = null;
-    if (game.gameStatus === 'active') {
+    if (['running', 'struggling', 'active'].includes(game.gameStatus)) {
       randomEvent = checkRandomEvent(game);
-      // Wait wait, checkRandomEvent modifies state, we must check bounds again or let gameEngine do bounds check
-      if (game.currentMoney <= 0 || game.stress >= 100) game.gameStatus = 'lost';
       
-      if (game.gameStatus === 'active') {
+      // If still going after random event, get next scenario
+      if (['running', 'struggling', 'active'].includes(game.gameStatus)) {
          const nextScenario = await generateScenario(game);
          game.lastScenario = nextScenario;
       }
     }
 
-    if (game.gameStatus !== 'active' && !game.summary) {
+    const isGameOver = ['won', 'lost', 'pivot'].includes(game.gameStatus);
+
+    if (isGameOver && !game.summary) {
       game.summary = await generateGameSummary(game);
     }
 
@@ -126,7 +127,7 @@ export const processCustomDecision = async (req, res) => {
     }
 
     if (!game) return res.status(404).json({ success: false, message: 'Game not found' });
-    if (game.gameStatus !== 'active') return res.status(400).json({ success: false, message: 'Game already ended' });
+    if (!['running', 'struggling', 'active'].includes(game.gameStatus)) return res.status(400).json({ success: false, message: 'Game already ended' });
     if (!customAnswer || !customAnswer.trim()) return res.status(400).json({ success: false, message: 'Custom answer required' });
 
     // Evaluate the custom string and generate next scenario all at once using LLM
@@ -154,16 +155,17 @@ export const processCustomDecision = async (req, res) => {
 
     // Trigger next steps
     let randomEvent = null;
-    if (game.gameStatus === 'active') {
+    if (['running', 'struggling', 'active'].includes(game.gameStatus)) {
       randomEvent = checkRandomEvent(game);
-      if (game.currentMoney <= 0 || game.stress >= 100) game.gameStatus = 'lost';
       
-      if (game.gameStatus === 'active') {
+      if (['running', 'struggling', 'active'].includes(game.gameStatus)) {
          game.lastScenario = combinedResult.nextScenario;
       }
     }
 
-    if (game.gameStatus !== 'active' && !game.summary) {
+    const isGameOver = ['won', 'lost', 'pivot'].includes(game.gameStatus);
+
+    if (isGameOver && !game.summary) {
       game.summary = await generateGameSummary(game);
     }
 

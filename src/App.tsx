@@ -3,6 +3,7 @@ import LandingPage from './components/LandingPage';
 import SetupForm from './components/SetupForm';
 import GameDashboard from './components/GameDashboard';
 import ResultPage from './components/ResultPage';
+import LoadingOverlay from './components/LoadingOverlay';
 import { GameState } from './types/game';
 
 type Screen = 'landing' | 'setup' | 'game' | 'result';
@@ -77,6 +78,7 @@ function App() {
       {screen === 'result' && endedGame && (
         <ResultPage game={endedGame} onRestart={handleRestart} onHome={handleHome} />
       )}
+      {loading && <LoadingOverlay />}
     </>
   );
 }

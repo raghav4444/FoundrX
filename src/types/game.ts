@@ -7,6 +7,10 @@ export interface ScenarioOption {
     money: number;
     growth: number;
     stress: number;
+    burn?: number;
+    morale?: number;
+    pmf?: number;
+    trust?: number;
   };
 }
 
@@ -23,6 +27,10 @@ export interface HistoryEntry {
     money: number;
     growth: number;
     stress: number;
+    burn?: number;
+    morale?: number;
+    pmf?: number;
+    trust?: number;
   };
 }
 
@@ -33,12 +41,16 @@ export interface GameState {
   startupType: string;
   initialMoney: number;
   currentMoney: number;
+  monthlyBurn: number;
   moneySource: string;
   growth: number;
   stress: number;
+  teamMorale: number;
+  productMarketFit: number;
+  marketTrust: number;
   stage: number;
   history: HistoryEntry[];
-  gameStatus: 'active' | 'won' | 'lost';
+  gameStatus: 'active' | 'running' | 'struggling' | 'pivot' | 'won' | 'lost';
   lastScenario?: Scenario;
   summary?: string;
 }

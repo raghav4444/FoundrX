@@ -12,8 +12,12 @@ User Startup State:
 Idea: ${gameState.startupIdea}
 Money: $${gameState.currentMoney}
 Source: ${gameState.moneySource}
+Burn: $${gameState.monthlyBurn || 0}/mo
 Growth: ${gameState.growth}/100
 Stress: ${gameState.stress}/100
+Morale: ${gameState.teamMorale || 50}/100
+PMF: ${gameState.productMarketFit || 30}/100
+Trust: ${gameState.marketTrust || 20}/100
 Stage: Month ${gameState.stage}
 Past Decisions:
 ${gameState.history.map(h => `- Month ${h.stage}: Chose "${h.decision}"`).join('\n')}
@@ -37,7 +41,7 @@ OUTPUT STRUCTURE MUST BE:
       "title": "Launch paid ads",
       "desc": "Spend $2000 on Facebook ads but it was poorly optimized",
       "impactHint": "high cost, loss of momentum",
-      "impact": { "money": -2000, "growth": -5, "stress": 5 }
+      "impact": { "money": -2000, "growth": -5, "stress": 5, "burn": 200, "morale": -10, "pmf": 0, "trust": 5 }
     }
   ]
 }
@@ -82,8 +86,8 @@ const getFallbackScenario = (gameState) => {
         id: 2,
         title: "Hire a Freelancer",
         desc: "Bring in temporary help.",
-        impactHint: "High cost, lowers stress.",
-        impact: { money: -2000, growth: 2, stress: -10 }
+        "impactHint": "High cost, lowers stress.",
+        "impact": { "money": -2000, "growth": 2, "stress": -10, "burn": 0, "morale": 5, "pmf": 0, "trust": 0 }
       },
       {
         id: 3,
@@ -107,8 +111,12 @@ User Startup State:
 Idea: ${gameState.startupIdea}
 Money: $${gameState.currentMoney}
 Source: ${gameState.moneySource}
+Burn: $${gameState.monthlyBurn || 0}/mo
 Growth: ${gameState.growth}/100
 Stress: ${gameState.stress}/100
+Morale: ${gameState.teamMorale || 50}/100
+PMF: ${gameState.productMarketFit || 30}/100
+Trust: ${gameState.marketTrust || 20}/100
 Recent Scenario: ${gameState.lastScenario?.scenario}
 Past Decisions:
 ${gameState.history.map(h => `- Month ${h.stage}: Chose "${h.decision}"`).join('\n')}
@@ -116,7 +124,7 @@ ${gameState.history.map(h => `- Month ${h.stage}: Chose "${h.decision}"`).join('
 The user chose to provide a CUSTOM response to the Recent Scenario instead of a pre-set option:
 "${customText}"
 
-Task 1: Evaluate this custom decision. How realistic is it? What are the consequences? Generate an impact object for this decision. Money impact (number), Growth (-20 to 30), Stress (-30 to +40).
+Task 1: Evaluate this custom decision. How realistic is it? What are the consequences? Generate an impact object for this decision. Money impact (number), Growth (-20 to 30), Stress (-30 to +40), Burn (-1000 to +5000), Morale (-30 to +30), PMF (-20 to +20), Trust (-20 to +20).
 Task 2: Assume those consequences are immediately applied. Generate the NEXT realistic, engaging scenario happening this month, along with 3 standard options.
 
 CRITICAL RULE: If any impact's "money" value is negative (costs money), its "growth" value MUST ALSO be negative or zero. Growth cannot increase if money decreases.
@@ -126,8 +134,8 @@ OUTPUT STRUCTURE MUST BE:
   "customImpact": {
     "title": "Custom Action",
     "desc": "Short description of the consequence of their custom action.",
-    "impactHint": "Brief hint like 'High cost, negative growth'",
-    "impact": { "money": -500, "growth": -5, "stress": 10 }
+    "impactHint": "Brief hint like 'High cost, negative growth, ruins morale'",
+    "impact": { "money": -500, "growth": -5, "stress": 10, "burn": 0, "morale": -15, "pmf": 0, "trust": -5 }
   },
   "nextScenario": {
     "scenario": "Your next challenge...",
@@ -137,21 +145,21 @@ OUTPUT STRUCTURE MUST BE:
         "title": "Option 1",
         "desc": "Option description",
         "impactHint": "Low cost",
-        "impact": { "money": 0, "growth": 5, "stress": 5 }
+        "impact": { "money": 0, "growth": 5, "stress": 5, "burn": 0, "morale": 0, "pmf": 2, "trust": 0 }
       },
       {
         "id": 2,
         "title": "Option 2",
         "desc": "Option description",
         "impactHint": "High cost, loss of momentum",
-        "impact": { "money": -1000, "growth": -10, "stress": 0 }
+        "impact": { "money": -1000, "growth": -10, "stress": 0, "burn": -200, "morale": -5, "pmf": 0, "trust": -5 }
       },
       {
         "id": 3,
         "title": "Option 3",
         "desc": "Option description",
         "impactHint": "Risky",
-        "impact": { "money": 0, "growth": -5, "stress": -5 }
+        "impact": { "money": 0, "growth": -5, "stress": -5, "burn": 0, "morale": 5, "pmf": -5, "trust": -5 }
       }
     ]
   }
@@ -180,7 +188,7 @@ OUTPUT STRUCTURE MUST BE:
         title: "Custom Approach",
         desc: "You improvised a solution.",
         impactHint: "Unpredictable results",
-        impact: { money: -500, growth: 5, stress: 5 }
+        impact: { money: -500, growth: 5, stress: 5, burn: 0, morale: 0, pmf: 0, trust: 0 }
       },
       nextScenario: getFallbackScenario(gameState)
     };
@@ -199,6 +207,10 @@ Idea: ${gameState.startupIdea}
 Final Money: $${gameState.currentMoney}
 Final Growth: ${gameState.growth}/100
 Final Stress: ${gameState.stress}/100
+Final Morale: ${gameState.teamMorale || 50}/100
+Final PMF: ${gameState.productMarketFit || 30}/100
+Final Trust: ${gameState.marketTrust || 20}/100
+Final Burn: $${gameState.monthlyBurn || 0}/mo
 Game Status: ${gameState.gameStatus}
 
 Past Decisions Log:

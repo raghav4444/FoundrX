@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, AlertTriangle, UserCircle2, Loader2, Zap } from 'lucide-react';
+import { DollarSign, TrendingUp, AlertTriangle, UserCircle2, Loader2, Zap, Flame, Users, Target, ShieldCheck } from 'lucide-react';
 import { GameState } from '../types/game';
 
 interface GameDashboardProps {
@@ -31,8 +31,10 @@ export default function GameDashboard({ gameId, onGameEnd }: GameDashboardProps)
       if (data.success) {
         setGame(data.game);
 
-        if (data.game.gameStatus !== 'active') {
-          onGameEnd(data.game);
+        if (['won', 'lost', 'pivot'].includes(data.game.gameStatus) || data.game.gameStatus === 'active') { // Active is technically old, handle just in case
+          if (data.game.gameStatus !== 'running' && data.game.gameStatus !== 'struggling') {
+            onGameEnd(data.game);
+          }
         }
       }
     } catch (error) {
@@ -163,48 +165,93 @@ export default function GameDashboard({ gameId, onGameEnd }: GameDashboardProps)
               <UserCircle2 className="w-4 h-4" /> {game.userId} • Month {game.stage}
             </div>
           </div>
-          <span className="glass-panel px-4 py-1 text-sm font-medium uppercase text-liquid-accent2 border-liquid-accent2/30 shadow-[0_0_10px_rgba(0,247,255,0.2)]">
-            Active Startup
+          <span className={`glass-panel px-4 py-1 text-sm font-medium uppercase border shadow-[0_0_10px_rgba(0,247,255,0.2)] ${
+            game.gameStatus === 'struggling' ? 'text-red-400 border-red-400/30' : 
+            game.gameStatus === 'pivot' ? 'text-yellow-400 border-yellow-400/30' :
+            'text-liquid-accent2 border-liquid-accent2/30'
+          }`}>
+            Status: {game.gameStatus.toUpperCase()}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-          <div className="glass-panel p-6 transform hover:-translate-y-1 transition-transform">
-            <div className="flex items-center gap-2 mb-2">
-              <DollarSign className="w-5 h-5 text-green-400" />
-              <span className="text-sm text-gray-400 uppercase tracking-wider font-bold">Capital</span>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="glass-panel p-4 md:p-6 transform hover:-translate-y-1 transition-transform">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-green-400" />
+                <span className="text-xs md:text-sm text-gray-400 uppercase tracking-wider font-bold">Capital</span>
+              </div>
             </div>
-            <p className={`text-3xl font-black tracking-tight ${game.currentMoney < 5000 ? 'text-red-400' : 'text-white'}`}>
+            <p className={`text-2xl md:text-3xl font-black tracking-tight ${game.currentMoney < (game.monthlyBurn || 0) * 2 ? 'text-red-400' : 'text-white'}`}>
               ${game.currentMoney.toLocaleString()}
             </p>
+            <div className="text-xs text-gray-500 mt-1 font-mono flex items-center gap-1">
+              <Flame className="w-3 h-3 text-orange-500" /> Burn: ${(game.monthlyBurn || 5000).toLocaleString()}/mo
+            </div>
           </div>
 
-          <div className="glass-panel p-6 transform hover:-translate-y-1 transition-transform">
+          <div className="glass-panel p-4 md:p-6 transform hover:-translate-y-1 transition-transform">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-liquid-accent2" />
-              <span className="text-sm text-gray-400 uppercase tracking-wider font-bold">Growth</span>
+              <span className="text-xs md:text-sm text-gray-400 uppercase tracking-wider font-bold">Growth</span>
             </div>
-            <p className={`text-3xl font-black tracking-tight ${getStatColor(game.growth)}`}>
+            <p className={`text-2xl md:text-3xl font-black tracking-tight ${getStatColor(game.growth)}`}>
               {game.growth}%
             </p>
           </div>
 
-          <div className="glass-panel p-6 col-span-2 md:col-span-1 transform hover:-translate-y-1 transition-transform">
+          <div className="glass-panel p-4 md:p-6 transform hover:-translate-y-1 transition-transform">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-5 h-5 text-orange-400" />
-              <span className="text-sm text-gray-400 uppercase tracking-wider font-bold">Stress</span>
+              <span className="text-xs md:text-sm text-gray-400 uppercase tracking-wider font-bold">Stress</span>
             </div>
-            <div className="flex items-end gap-2">
-              <p className={`text-3xl font-black tracking-tight ${getStatColor(game.stress, true)}`}>
-                {game.stress}%
-              </p>
-              <div className="flex-1 h-2 bg-gray-800 rounded-full mb-1.5 overflow-hidden">
-                <div 
-                  className={`h-full ${game.stress > 80 ? 'bg-red-500' : game.stress > 50 ? 'bg-orange-500' : 'bg-green-500'}`} 
-                  style={{ width: `${Math.min(game.stress, 100)}%` }}
-                />
-              </div>
+            <p className={`text-2xl md:text-3xl font-black tracking-tight ${getStatColor(game.stress, true)}`}>
+              {game.stress}%
+            </p>
+          </div>
+
+          <div className="glass-panel p-4 md:p-6 transform hover:-translate-y-1 transition-transform">
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="w-5 h-5 text-pink-400" />
+              <span className="text-xs md:text-sm text-gray-400 uppercase tracking-wider font-bold">Morale</span>
             </div>
+            <p className={`text-2xl md:text-3xl font-black tracking-tight ${getStatColor(game.teamMorale || 50)}`}>
+              {game.teamMorale || 50}%
+            </p>
+          </div>
+          
+          <div className="glass-panel p-4 md:p-6 transform hover:-translate-y-1 transition-transform col-span-2">
+             <div className="flex flex-col md:flex-row justify-between h-full gap-4">
+               <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-5 h-5 text-purple-400" />
+                    <span className="text-xs md:text-sm text-gray-400 uppercase tracking-wider font-bold">Product-Market Fit</span>
+                  </div>
+                  <div className="flex items-end gap-2 mt-auto">
+                    <p className={`text-2xl md:text-3xl font-black tracking-tight ${getStatColor(game.productMarketFit || 30)}`}>
+                      {game.productMarketFit || 30}%
+                    </p>
+                    <div className="flex-1 h-2 bg-gray-800 rounded-full mb-1.5 overflow-hidden">
+                      <div className="h-full bg-purple-500" style={{ width: `${Math.min(game.productMarketFit || 30, 100)}%` }} />
+                    </div>
+                  </div>
+               </div>
+               <div className="w-px bg-white/10 hidden md:block"></div>
+               <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ShieldCheck className="w-5 h-5 text-blue-400" />
+                    <span className="text-xs md:text-sm text-gray-400 uppercase tracking-wider font-bold">Market Trust</span>
+                  </div>
+                  <div className="flex items-end gap-2 mt-auto">
+                    <p className={`text-2xl md:text-3xl font-black tracking-tight ${getStatColor(game.marketTrust || 20)}`}>
+                      {game.marketTrust || 20}%
+                    </p>
+                    <div className="flex-1 h-2 bg-gray-800 rounded-full mb-1.5 overflow-hidden">
+                      <div className="h-full bg-blue-500" style={{ width: `${Math.min(game.marketTrust || 20, 100)}%` }} />
+                    </div>
+                  </div>
+               </div>
+             </div>
           </div>
         </div>
 
